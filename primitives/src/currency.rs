@@ -205,6 +205,8 @@ create_currency_id! {
 		PHA("Phala Native Token", 12) = 170,
 		KINT("Kintsugi Native Token", 12) = 171,
 		KBTC("Kintsugi Wrapped BTC", 8) = 172,
+
+		QTZ("Unique Quartz", 18) = 200,
 	}
 }
 

@@ -790,6 +790,7 @@ parameter_type_with_key! {
 				TokenSymbol::TAI => 10 * millicent(*currency_id),
 				TokenSymbol::ACA |
 				TokenSymbol::KAR |
+				TokenSymbol::QTZ |
 				TokenSymbol::CASH => Balance::max_value() // unsupported
 			},
 			CurrencyId::DexShare(dex_share_0, _) => {
