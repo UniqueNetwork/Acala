@@ -769,6 +769,7 @@ parameter_type_with_key! {
 				TokenSymbol::KINT => 13333 * microcent(*currency_id), // 1.33 KINT = 1 KSM
 				TokenSymbol::KBTC => 66 * microcent(*currency_id), // 1KBTC = 150 KSM
 				TokenSymbol::TAI => dollar(*currency_id), // 1 KUSD = 100 TAI
+				TokenSymbol::QTZ => 1 * microcent(*currency_id),
 
 				TokenSymbol::ACA |
 				TokenSymbol::AUSD |
@@ -1595,6 +1596,14 @@ parameter_types! {
 		// KINT:KSM = 4:3
 		(ksm_per_second() * 4) / 3
 	);
+	pub QtzPerSecond: (AssetId, u128) = (
+		MultiLocation::new(
+			1,
+			X1(Parachain(parachains::quartz::ID)),
+		).into(),
+		// QTZ:KSM = 1:1
+		ksm_per_second()
+	);
 
 	pub ForeignAssetUnitsPerSecond: u128 = kar_per_second();
 	pub KarPerSecondAsBased: u128 = kar_per_second();
@@ -1615,6 +1624,7 @@ pub type Trader = (
 	FixedRateOfFungible<PHAPerSecond, ToTreasury>,
 	FixedRateOfFungible<KbtcPerSecond, ToTreasury>,
 	FixedRateOfFungible<KintPerSecond, ToTreasury>,
+	FixedRateOfFungible<QtzPerSecond, ToTreasury>,
 	FixedRateOfForeignAsset<Runtime, ForeignAssetUnitsPerSecond, ToTreasury>,
 );
 
@@ -1814,6 +1824,8 @@ impl Convert<CurrencyId, Option<MultiLocation>> for CurrencyIdConvert {
 					GeneralKey(parachains::kintsugi::KBTC_KEY.to_vec()),
 				),
 			)),
+			// Unique Quartz
+			Token(QTZ) => Some(MultiLocation::new(1, X1(Parachain(parachains::quartz::ID)))),
 			CurrencyId::ForeignAsset(foreign_asset_id) => AssetIdMaps::<Runtime>::get_multi_location(foreign_asset_id),
 			_ => None,
 		}
@@ -1879,6 +1891,10 @@ impl Convert<MultiLocation, Option<CurrencyId>> for CurrencyIdConvert {
 					}
 				}
 			},
+			MultiLocation {
+				parents: 1,
+				interior: X1(Parachain(parachains::quartz::ID)),
+			} => Some(Token(QTZ)),
 			_ => None,
 		}
 	}
