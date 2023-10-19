@@ -8240,8 +8240,28 @@ name = "orml-xcm-support"
 version = "0.4.1-dev"
 dependencies = [
  "frame-support",
+ "log",
  "orml-traits",
  "parity-scale-codec",
+ "scale-info",
+ "sp-runtime",
+ "sp-std",
+ "xcm",
+ "xcm-builder",
+ "xcm-executor",
+]
+
+[[package]]
+name = "orml-xnft"
+version = "0.4.1-dev"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
  "sp-runtime",
  "sp-std",
  "staging-xcm",
