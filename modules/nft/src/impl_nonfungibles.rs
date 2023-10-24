@@ -76,6 +76,15 @@ impl<T: Config> Create<T::AccountId, Properties> for Pallet<T> {
 		};
 		orml_nft::Pallet::<T>::create_class(who, Default::default(), data)
 	}
+
+	fn create_collection_with_id(
+		collection: Self::CollectionId,
+		who: &T::AccountId,
+		admin: &T::AccountId,
+		config: &Properties,
+	) -> Result<(), DispatchError> {
+		unimplemented!()
+	}
 }
 
 impl<T: Config> Mutate<T::AccountId, TokenData<BalanceOf<T>>> for Pallet<T> {
