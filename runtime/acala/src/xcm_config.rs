@@ -21,7 +21,7 @@ use super::{
 	AcalaTreasuryAccount, AccountId, AllPalletsWithSystem, AssetIdMapping, AssetIdMaps, Balance, Balances, Convert,
 	Currencies, CurrencyId, EvmAddressMapping, ExistentialDeposits, GetNativeCurrencyId, NativeTokenExistentialDeposit,
 	ParachainInfo, ParachainSystem, PolkadotXcm, Runtime, RuntimeCall, RuntimeEvent, RuntimeOrigin, UnknownTokens,
-	XcmInterface, XcmpQueue, ACA, AUSD, TAP,
+	XcmInterface, XcmpQueue, ACA, AUSD, TAP, XNFT,
 };
 use codec::{Decode, Encode};
 use frame_support::{
@@ -34,14 +34,17 @@ use module_asset_registry::{
 use module_support::HomaSubAccountXcm;
 use module_transaction_payment::BuyWeightRateOfTransactionFeePool;
 use orml_traits::{location::AbsoluteReserveProvider, parameter_type_with_key};
-use orml_xcm_support::{DepositToAlternative, IsNativeConcrete, MultiCurrencyAdapter, MultiNativeAsset};
+use orml_xcm_support::{
+	parity_adapters::NonFungiblesV2Adapter, DepositToAlternative, IsNativeConcrete, MultiCurrencyAdapter,
+	MultiNativeAsset,
+};
 use primitives::evm::is_system_contract;
 use runtime_common::{
 	local_currency_location, native_currency_location, AcalaDropAssets, EnsureRootOrHalfGeneralCouncil,
 	EnsureRootOrThreeFourthsGeneralCouncil, FixedRateOfAsset,
 };
 use xcm::{prelude::*, v3::Weight as XcmWeight};
-use xcm_builder::{EnsureXcmOrigin, FixedRateOfFungible, FixedWeightBounds, SignedToAccountId32};
+use xcm_builder::{EnsureXcmOrigin, FixedRateOfFungible, FixedWeightBounds, NoChecking, SignedToAccountId32};
 
 parameter_types! {
 	pub const RelayNetwork: NetworkId = NetworkId::Polkadot;
@@ -214,16 +217,27 @@ impl cumulus_pallet_dmp_queue::Config for Runtime {
 	type ExecuteOverweightOrigin = EnsureRootOrHalfGeneralCouncil;
 }
 
-pub type LocalAssetTransactor = MultiCurrencyAdapter<
-	Currencies,
-	UnknownTokens,
-	IsNativeConcrete<CurrencyId, CurrencyIdConvert>,
-	AccountId,
-	LocationToAccountId,
-	CurrencyId,
-	CurrencyIdConvert,
-	DepositToAlternative<AcalaTreasuryAccount, Currencies, CurrencyId, AccountId, Balance>,
->;
+pub type LocalAssetTransactor = (
+	MultiCurrencyAdapter<
+		Currencies,
+		UnknownTokens,
+		IsNativeConcrete<CurrencyId, CurrencyIdConvert>,
+		AccountId,
+		LocationToAccountId,
+		CurrencyId,
+		CurrencyIdConvert,
+		DepositToAlternative<AcalaTreasuryAccount, Currencies, CurrencyId, AccountId, Balance>,
+	>,
+	NonFungiblesV2Adapter<
+		XNFT,
+		XNFT,
+		LocationToAccountId,
+		AccountId,
+		NoChecking,
+		(),
+		module_nft::TokenData<module_nft::BalanceOf<Runtime>>,
+	>,
+);
 
 pub struct CurrencyIdConvert;
 impl Convert<CurrencyId, Option<MultiLocation>> for CurrencyIdConvert {

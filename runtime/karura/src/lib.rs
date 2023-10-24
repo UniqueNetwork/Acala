@@ -1316,6 +1316,15 @@ impl orml_nft::Config for Runtime {
 	type MaxTokenMetadata = ConstU32<1024>;
 }
 
+impl orml_xnft::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type NftExecutor = NFT;
+
+	type ItemConfig = module_nft::TokenData<module_nft::BalanceOf<Self>>;
+
+	type CollectionConfig = primitives::nft::Properties;
+}
+
 impl InstanceFilter<RuntimeCall> for ProxyType {
 	fn filter(&self, c: &RuntimeCall) -> bool {
 		match self {
@@ -1815,6 +1824,7 @@ construct_runtime!(
 		// Karura Other
 		Incentives: module_incentives = 120,
 		NFT: module_nft = 121,
+		XNFT: orml_xnft = 124,
 		AssetRegistry: module_asset_registry = 122,
 
 		// Smart contracts

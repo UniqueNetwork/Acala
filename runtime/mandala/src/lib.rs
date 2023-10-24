@@ -1468,6 +1468,15 @@ impl orml_nft::Config for Runtime {
 	type MaxTokenMetadata = ConstU32<1024>;
 }
 
+impl orml_xnft::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type NftExecutor = NFT;
+
+	type ItemConfig = module_nft::TokenData<module_nft::BalanceOf<Self>>;
+
+	type CollectionConfig = primitives::nft::Properties;
+}
+
 parameter_types! {
 	// One storage item; key size 32, value size 8; .
 	pub ProxyDepositBase: Balance = deposit(1, 8);
@@ -2043,6 +2052,7 @@ construct_runtime!(
 		// Acala Other
 		Incentives: module_incentives = 140,
 		NFT: module_nft = 141,
+		XNFT: orml_xnft = 144,
 		AssetRegistry: module_asset_registry = 142,
 		LiquidCrowdloan: module_liquid_crowdloan = 143,
 
