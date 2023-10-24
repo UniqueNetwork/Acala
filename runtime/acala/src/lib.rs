@@ -50,6 +50,7 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
+use cumulus_pallet_parachain_system::RelaychainDataProvider;
 use frame_system::{EnsureRoot, EnsureSigned, RawOrigin};
 use module_asset_registry::{AssetIdMaps, EvmErc20InfoMapping};
 use module_cdp_engine::CollateralCurrencyIds;
@@ -59,8 +60,6 @@ use module_evm_accounts::EvmAddressMapping;
 use module_relaychain::RelayChainCallBuilder;
 use module_support::{AssetIdMapping, DispatchableTask, PoolId};
 use module_transaction_payment::TargetedFeeAdjustment;
-
-use cumulus_pallet_parachain_system::RelaychainDataProvider;
 use orml_traits::{
 	create_median_value_data_provider, define_aggregrated_parameters, parameter_type_with_key,
 	parameters::ParameterStoreAdapter, DataFeeder, DataProviderExtended,
@@ -1312,6 +1311,15 @@ impl orml_nft::Config for Runtime {
 	type MaxTokenMetadata = ConstU32<1024>;
 }
 
+impl orml_xnft::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type NftExecutor = NFT;
+
+	type ItemConfig = module_nft::TokenData<module_nft::BalanceOf<Self>>;
+
+	type CollectionConfig = primitives::nft::Properties;
+}
+
 impl InstanceFilter<RuntimeCall> for ProxyType {
 	fn filter(&self, c: &RuntimeCall) -> bool {
 		match self {
@@ -1822,6 +1830,7 @@ construct_runtime!(
 		// Acala Other
 		Incentives: module_incentives = 120,
 		NFT: module_nft = 121,
+		XNFT: orml_xnft = 124,
 		AssetRegistry: module_asset_registry = 122,
 		LiquidCrowdloan: module_liquid_crowdloan = 123,
 

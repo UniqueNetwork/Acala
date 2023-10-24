@@ -48,6 +48,7 @@ use sp_runtime::{
 use sp_std::prelude::*;
 
 pub mod benchmarking;
+pub mod impl_nonfungibles;
 mod mock;
 mod tests;
 pub mod weights;
@@ -65,7 +66,7 @@ pub struct ClassData<Balance> {
 	pub attributes: Attributes,
 }
 
-#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo, Serialize, Deserialize)]
+#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo, Serialize, Deserialize, Default)]
 pub struct TokenData<Balance> {
 	/// Deposit reserved to create token
 	pub deposit: Balance,
