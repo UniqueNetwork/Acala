@@ -20,7 +20,7 @@ use super::{
 	constants::fee::*, AccountId, AllPalletsWithSystem, AssetIdMapping, AssetIdMaps, Balance, Balances, Convert,
 	Currencies, CurrencyId, EvmAddressMapping, ExistentialDeposits, GetNativeCurrencyId, NativeTokenExistentialDeposit,
 	ParachainInfo, ParachainSystem, PolkadotXcm, Runtime, RuntimeCall, RuntimeEvent, RuntimeOrigin, TreasuryAccount,
-	UnknownTokens, XcmpQueue, ACA, XNFT,
+	UnknownTokens, XcmpQueue, ACA,
 };
 use codec::{Decode, Encode};
 pub use cumulus_primitives_core::ParaId;
@@ -32,10 +32,7 @@ pub use frame_support::{
 use module_asset_registry::{BuyWeightRateOfErc20, BuyWeightRateOfForeignAsset, BuyWeightRateOfStableAsset};
 use module_transaction_payment::BuyWeightRateOfTransactionFeePool;
 use orml_traits::{location::AbsoluteReserveProvider, parameter_type_with_key, MultiCurrency};
-use orml_xcm_support::{
-	parity_adapters::NonFungiblesV2Adapter, DepositToAlternative, IsNativeConcrete, MultiCurrencyAdapter,
-	MultiNativeAsset,
-};
+use orml_xcm_support::{DepositToAlternative, IsNativeConcrete, MultiCurrencyAdapter, MultiNativeAsset};
 use pallet_xcm::XcmPassthrough;
 use polkadot_parachain::primitives::Sibling;
 use primitives::evm::is_system_contract;
@@ -47,9 +44,8 @@ use xcm::{prelude::*, v3::Weight as XcmWeight};
 pub use xcm_builder::{
 	AccountId32Aliases, AllowKnownQueryResponses, AllowSubscriptionsFrom, AllowTopLevelPaidExecutionFrom,
 	AllowUnpaidExecutionFrom, EnsureXcmOrigin, FixedRateOfFungible, FixedWeightBounds, IsConcrete, NativeAsset,
-	NoChecking, ParentAsSuperuser, ParentIsPreset, RelayChainAsNative, SiblingParachainAsNative,
-	SiblingParachainConvertsVia, SignedAccountId32AsNative, SignedToAccountId32, SovereignSignedViaLocation,
-	TakeRevenue, TakeWeightCredit,
+	ParentAsSuperuser, ParentIsPreset, RelayChainAsNative, SiblingParachainAsNative, SiblingParachainConvertsVia,
+	SignedAccountId32AsNative, SignedToAccountId32, SovereignSignedViaLocation, TakeRevenue, TakeWeightCredit,
 };
 
 parameter_types! {
@@ -262,27 +258,16 @@ impl cumulus_pallet_dmp_queue::Config for Runtime {
 	type ExecuteOverweightOrigin = EnsureRootOrHalfGeneralCouncil;
 }
 
-pub type LocalAssetTransactor = (
-	MultiCurrencyAdapter<
-		Currencies,
-		UnknownTokens,
-		IsNativeConcrete<CurrencyId, CurrencyIdConvert>,
-		AccountId,
-		LocationToAccountId,
-		CurrencyId,
-		CurrencyIdConvert,
-		DepositToAlternative<TreasuryAccount, Currencies, CurrencyId, AccountId, Balance>,
-	>,
-	NonFungiblesV2Adapter<
-		XNFT,
-		XNFT,
-		LocationToAccountId,
-		AccountId,
-		NoChecking,
-		(),
-		module_nft::TokenData<module_nft::BalanceOf<Runtime>>,
-	>,
-);
+pub type LocalAssetTransactor = MultiCurrencyAdapter<
+	Currencies,
+	UnknownTokens,
+	IsNativeConcrete<CurrencyId, CurrencyIdConvert>,
+	AccountId,
+	LocationToAccountId,
+	CurrencyId,
+	CurrencyIdConvert,
+	DepositToAlternative<TreasuryAccount, Currencies, CurrencyId, AccountId, Balance>,
+>;
 
 pub struct CurrencyIdConvert;
 impl Convert<CurrencyId, Option<MultiLocation>> for CurrencyIdConvert {

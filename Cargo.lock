@@ -6386,7 +6386,6 @@ dependencies = [
  "orml-vesting",
  "orml-xcm",
  "orml-xcm-support",
- "orml-xnft",
  "orml-xtokens",
  "pallet-aura",
  "pallet-authorship",
