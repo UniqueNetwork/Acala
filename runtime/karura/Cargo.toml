@@ -371,6 +371,7 @@ try-runtime = [
 	"orml-auction/try-runtime",
 	"orml-authority/try-runtime",
 	"orml-nft/try-runtime",
+	"orml-xnft/try-runtime",
 	"orml-oracle/try-runtime",
 	"orml-parameters/try-runtime",
 	"orml-rewards/try-runtime",
