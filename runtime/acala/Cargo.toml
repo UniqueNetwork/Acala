@@ -131,8 +131,6 @@ module-transaction-pause = { path = "../../modules/transaction-pause", default-f
 module-transaction-payment = { path = "../../modules/transaction-payment", default-features = false }
 module-xcm-interface = { path = "../../modules/xcm-interface", default-features = false }
 
-orml-xnft = { path = "../../orml/xnft", default-features = false }
-
 primitives = { package = "acala-primitives", path = "../../primitives", default-features = false }
 runtime-common = { path = "../common", default-features = false }
 
@@ -160,7 +158,7 @@ std = [
 	"hex/std",
 	"scale-info/std",
 	"serde_json/std",
-	"orml-xnft/std",
+
 	"frame-benchmarking/std",
 	"frame-executive/std",
 	"frame-support/std",
