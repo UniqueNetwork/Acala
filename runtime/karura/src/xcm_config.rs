@@ -300,6 +300,15 @@ impl orml_xtokens::Config for Runtime {
 }
 
 pub type LocalAssetTransactor = (
+	NonFungiblesV2Adapter<
+		XNFT,
+		XNFT,
+		LocationToAccountId,
+		AccountId,
+		NoChecking,
+		(),
+		module_nft::TokenData<module_nft::BalanceOf<Runtime>>,
+	>,
 	MultiCurrencyAdapter<
 		Currencies,
 		UnknownTokens,
@@ -309,15 +318,6 @@ pub type LocalAssetTransactor = (
 		CurrencyId,
 		CurrencyIdConvert,
 		DepositToAlternative<KaruraTreasuryAccount, Currencies, CurrencyId, AccountId, Balance>,
-	>,
-	NonFungiblesV2Adapter<
-		XNFT,
-		XNFT,
-		LocationToAccountId,
-		AccountId,
-		NoChecking,
-		(),
-		module_nft::TokenData<module_nft::BalanceOf<Runtime>>,
 	>,
 );
 
