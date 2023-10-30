@@ -16,6 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use core::marker::PhantomData;
+
 use super::{
 	constants::{fee::*, parachains},
 	AccountId, AllPalletsWithSystem, AssetIdMapping, AssetIdMaps, Balance, Balances, Convert, Currencies, CurrencyId,
@@ -41,8 +43,11 @@ use runtime_common::{
 	local_currency_location, native_currency_location, AcalaDropAssets, EnsureRootOrHalfGeneralCouncil,
 	EnsureRootOrThreeFourthsGeneralCouncil,
 };
-use xcm::{prelude::*, v3::Weight as XcmWeight};
-use xcm_builder::{EnsureXcmOrigin, FixedRateOfFungible, FixedWeightBounds, NoChecking, SignedToAccountId32};
+use sp_runtime::traits::MaybeEquivalence;
+use xcm::{prelude::*, v3::Junctions::X2, v3::Weight as XcmWeight};
+use xcm_builder::{
+	ConvertedConcreteId, EnsureXcmOrigin, FixedRateOfFungible, FixedWeightBounds, NoChecking, SignedToAccountId32,
+};
 
 parameter_types! {
 	pub const RelayNetwork: NetworkId = NetworkId::Kusama;
@@ -299,6 +304,58 @@ impl orml_xtokens::Config for Runtime {
 	type ReserveProvider = AbsoluteReserveProvider;
 }
 
+pub(crate) type LocalAssetMatcher = (
+	XNFT,
+	ConvertedConcreteId<
+		module_nft::ClassIdOf<Runtime>,
+		module_nft::TokenIdOf<Runtime>,
+		ConvertClassId<Runtime>,
+		ConvertInstanceId<Runtime>,
+	>,
+);
+
+pub(crate) struct ConvertClassId<T>(PhantomData<T>);
+
+impl<T: module_nft::Config> MaybeEquivalence<MultiLocation, T::ClassId> for ConvertClassId<T>
+where
+	u128: TryFrom<T::ClassId>,
+	T::ClassId: TryFrom<u128>,
+{
+	fn convert(a: &MultiLocation) -> Option<T::ClassId> {
+		match a {
+			MultiLocation {
+				parents: 1,
+				interior: X2(Parachain(1002), GeneralIndex(index)),
+			} => (*index).try_into().ok(),
+			_ => None,
+		}
+	}
+
+	fn convert_back(b: &T::ClassId) -> Option<MultiLocation> {
+		match (*b).try_into() {
+			Ok(index) => Some(MultiLocation {
+				parents: 1,
+				interior: X2(Parachain(1002), GeneralIndex(index)),
+			}),
+			Err(_) => None,
+		}
+	}
+}
+
+pub(crate) struct ConvertInstanceId<T>(PhantomData<T>);
+impl<T: module_nft::Config> MaybeEquivalence<AssetInstance, T::TokenId> for ConvertInstanceId<T>
+where
+	u128: TryFrom<T::TokenId>,
+	T::TokenId: TryFrom<u128>,
+{
+	fn convert(a: &AssetInstance) -> Option<T::TokenId> {
+		todo!()
+	}
+
+	fn convert_back(b: &T::TokenId) -> Option<AssetInstance> {
+		todo!()
+	}
+}
 pub type LocalAssetTransactor = (
 	NonFungiblesV2Adapter<
 		XNFT,
