@@ -41,7 +41,7 @@ where
 			return Err(XcmExecutorError::AssetNotHandled.into());
 		};
 
-		let (collection_id, is_foreign_asset) = Self::asset_to_collection(&what.id)?;
+		let (class_id, is_foreign_asset) = Self::asset_to_collection(&what.id)?;
 
 		let to = <ConverterOf<T>>::convert_location(who).ok_or(XcmExecutorError::AccountIdConversionFailed)?;
 
@@ -51,40 +51,67 @@ where
 			Self::deposit_local_asset
 		};
 
-		deposit_handler(&to, collection_id, &asset_instance)
+		deposit_handler(&to, class_id, &asset_instance)
 	}
 
 	fn withdraw_asset(
-		_what: &MultiAsset,
-		_who: &xcm::v3::MultiLocation,
+		what: &MultiAsset,
+		who: &xcm::v3::MultiLocation,
 		_maybe_context: Option<&xcm::v3::XcmContext>,
 	) -> Result<xcm_executor::Assets, xcm::v3::Error> {
-		Err(xcm::v3::Error::Unimplemented)
+		log::trace!(
+			target: LOG_TARGET,
+			"withdraw_asset what: {:?}, who: {:?}, maybe_context: {:?}",
+			what,
+			who,
+			_maybe_context,
+		);
+
+		let Fungibility::NonFungible(asset_instance) = what.fun else {
+			return Err(XcmExecutorError::AssetNotHandled.into());
+		};
+
+		let (class_id, is_foreign_asset) = Self::asset_to_collection(&what.id)?;
+
+		let from = <ConverterOf<T>>::convert_location(who).ok_or(XcmExecutorError::AccountIdConversionFailed)?;
+
+		let token_id = Self::asset_instance_to_token_id(class_id, is_foreign_asset, &asset_instance)
+			.ok_or(XcmExecutorError::InstanceConversionFailed)?;
+
+		<ModuleNftPallet<T>>::do_transfer(&from, &Self::account_id(), (class_id, token_id))
+			.map(|_| what.clone().into())
+			.map_err(|_| XcmError::FailedToTransactAsset("non-fungible item withdraw failed"))
 	}
 
 	fn internal_transfer_asset(
-		_asset: &MultiAsset,
-		_from: &xcm::v3::MultiLocation,
-		_to: &xcm::v3::MultiLocation,
-		_context: &xcm::v3::XcmContext,
-	) -> Result<xcm_executor::Assets, xcm::v3::Error> {
-		Err(xcm::v3::Error::Unimplemented)
-	}
-
-	fn transfer_asset(
 		asset: &MultiAsset,
 		from: &xcm::v3::MultiLocation,
 		to: &xcm::v3::MultiLocation,
-		context: &xcm::v3::XcmContext,
+		_context: &xcm::v3::XcmContext,
 	) -> Result<xcm_executor::Assets, xcm::v3::Error> {
-		match Self::internal_transfer_asset(asset, from, to, context) {
-			Err(xcm::v3::Error::AssetNotFound | xcm::v3::Error::Unimplemented) => {
-				let assets = Self::withdraw_asset(asset, from, Some(context))?;
-				// Not a very forgiving attitude; once we implement roll-backs then it'll be nicer.
-				Self::deposit_asset(asset, to, context)?;
-				Ok(assets)
-			}
-			result => result,
-		}
+		log::trace!(
+			target: LOG_TARGET,
+			"internal_transfer_asset: {:?}, from: {:?}, to: {:?}, context: {:?}",
+			asset,
+			from,
+			to,
+			_context
+		);
+
+		let Fungibility::NonFungible(asset_instance) = asset.fun else {
+			return Err(XcmExecutorError::AssetNotHandled.into());
+		};
+
+		let (class_id, is_foreign_asset) = Self::asset_to_collection(&asset.id)?;
+
+		let from = <ConverterOf<T>>::convert_location(from).ok_or(XcmExecutorError::AccountIdConversionFailed)?;
+		let to = <ConverterOf<T>>::convert_location(to).ok_or(XcmExecutorError::AccountIdConversionFailed)?;
+
+		let token_id = Self::asset_instance_to_token_id(class_id, is_foreign_asset, &asset_instance)
+			.ok_or(XcmExecutorError::InstanceConversionFailed)?;
+
+		<ModuleNftPallet<T>>::do_transfer(&from, &to, (class_id, token_id))
+			.map(|_| asset.clone().into())
+			.map_err(|_| XcmError::FailedToTransactAsset("non-fungible item internal transfer failed"))
 	}
 }

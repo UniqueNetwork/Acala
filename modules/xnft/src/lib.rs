@@ -12,7 +12,8 @@ use module_nft::{ClassIdOf, TokenIdOf};
 use sp_runtime::{traits::AccountIdConversion, DispatchResult};
 use sp_std::boxed::Box;
 use xcm::v3::{
-	AssetId, AssetInstance, Fungibility, Junction::*, Junctions::*, MultiAsset, MultiLocation, Result as XcmResult,
+	AssetId, AssetInstance, Error as XcmError, Fungibility, Junction::*, Junctions::*, MultiAsset, MultiLocation,
+	Result as XcmResult,
 };
 use xcm_executor::traits::{ConvertLocation, Error as XcmExecutorError, TransactAsset};
 pub mod impl_matches;
