@@ -1318,11 +1318,10 @@ impl orml_nft::Config for Runtime {
 
 impl module_xnft::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type NftExecutor = NFT;
 
-	type ItemConfig = module_nft::TokenData<module_nft::BalanceOf<Self>>;
+	type AccountIdConverter = xcm_config::LocationToAccountId;
 
-	type CollectionConfig = primitives::nft::Properties;
+	type NtfPalletLocation = xcm_config::NftLocation;
 }
 
 impl InstanceFilter<RuntimeCall> for ProxyType {
@@ -1824,7 +1823,7 @@ construct_runtime!(
 		// Karura Other
 		Incentives: module_incentives = 120,
 		NFT: module_nft = 121,
-		XNFT: orml_xnft = 124,
+		XNFT: module_xnft = 124,
 		AssetRegistry: module_asset_registry = 122,
 
 		// Smart contracts
