@@ -6,21 +6,21 @@ use xcm_executor::traits::{Error as MatchError, MatchesNonFungibles};
 
 impl<T: Config> Pallet<T>
 where
-	ItemIdOf<T>: MaxEncodedLen + Incrementable + TryFrom<u128>,
-	CollectionIdOf<T>: MaxEncodedLen + TryFrom<u128>,
+	TokenIdOf<T>: MaxEncodedLen + Incrementable + TryFrom<u128>,
+	ClassIdOf<T>: MaxEncodedLen + TryFrom<u128>,
 {
-	pub fn asset_to_collection(asset: &AssetId) -> Result<(CollectionIdOf<T>, bool), MatchError> {
+	pub fn asset_to_collection(asset: &AssetId) -> Result<(ClassIdOf<T>, bool), MatchError> {
 		Self::foreign_asset_to_collection(asset)
 			.map(|a| (a, true))
 			.or_else(|| Self::local_asset_to_collection(asset).map(|a| (a, false)))
 			.ok_or(MatchError::AssetIdConversionFailed)
 	}
 
-	pub fn foreign_asset_to_collection(asset: &AssetId) -> Option<CollectionIdOf<T>> {
+	pub fn foreign_asset_to_collection(asset: &AssetId) -> Option<ClassIdOf<T>> {
 		Self::assets(asset)
 	}
 
-	pub fn local_asset_to_collection(asset: &AssetId) -> Option<CollectionIdOf<T>> {
+	pub fn local_asset_to_collection(asset: &AssetId) -> Option<ClassIdOf<T>> {
 		let Concrete(asset_location) = asset else {
 			return None;
 		};
@@ -34,11 +34,7 @@ where
 		}
 	}
 
-	pub fn deposit_foreign_asset(
-		to: &T::AccountId,
-		asset: CollectionIdOf<T>,
-		asset_instance: &AssetInstance,
-	) -> XcmResult {
+	pub fn deposit_foreign_asset(to: &T::AccountId, asset: ClassIdOf<T>, asset_instance: &AssetInstance) -> XcmResult {
 		match Self::items(asset, asset_instance) {
 			Some(token_id) => {
 				let current_owner =
@@ -55,11 +51,7 @@ where
 		}
 	}
 
-	pub fn deposit_local_asset(
-		to: &T::AccountId,
-		asset: CollectionIdOf<T>,
-		asset_instance: &AssetInstance,
-	) -> XcmResult {
+	pub fn deposit_local_asset(to: &T::AccountId, asset: ClassIdOf<T>, asset_instance: &AssetInstance) -> XcmResult {
 		let token_id = Self::convert_asset_instance(asset_instance)?;
 
 		let current_owner =
@@ -68,7 +60,7 @@ where
 			.map_err(|_| XcmError::LocationNotInvertible)
 	}
 
-	pub fn convert_asset_instance(asset: &AssetInstance) -> Result<ItemIdOf<T>, MatchError> {
+	pub fn convert_asset_instance(asset: &AssetInstance) -> Result<TokenIdOf<T>, MatchError> {
 		let AssetInstance::Index(index) = asset else {
 			return Err(MatchError::InstanceConversionFailed);
 		};

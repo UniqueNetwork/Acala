@@ -1319,7 +1319,7 @@ impl orml_nft::Config for Runtime {
 impl module_xnft::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 
-	type AccountIdConverter = xcm_config::LocationToAccountId;
+	type LocationToAccountId = xcm_config::LocationToAccountId;
 
 	type NtfPalletLocation = xcm_config::NftLocation;
 }

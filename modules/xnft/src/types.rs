@@ -1,12 +1,6 @@
-use module_nft::{ClassIdOf, TokenIdOf};
-
 use crate::*;
 
-pub type ItemIdOf<T> = TokenIdOf<T>;
-
-pub type CollectionIdOf<T> = ClassIdOf<T>;
-
-pub type ConverterOf<T> = <T as Config>::AccountIdConverter;
+pub type ConverterOf<T> = <T as Config>::LocationToAccountId;
 
 pub type ModuleNftPallet<T> = module_nft::Pallet<T>;
 

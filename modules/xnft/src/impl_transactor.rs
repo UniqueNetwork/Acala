@@ -5,8 +5,8 @@ const LOG_TARGET: &str = "xcm::module_xnft::transactor";
 
 impl<T: Config> TransactAsset for Pallet<T>
 where
-	ItemIdOf<T>: MaxEncodedLen + Incrementable + TryFrom<u128>,
-	CollectionIdOf<T>: MaxEncodedLen + TryFrom<u128>,
+	TokenIdOf<T>: MaxEncodedLen + Incrementable + TryFrom<u128>,
+	ClassIdOf<T>: MaxEncodedLen + TryFrom<u128>,
 {
 	fn can_check_in(
 		_origin: &xcm::v3::MultiLocation,
