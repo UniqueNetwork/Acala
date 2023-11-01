@@ -5471,6 +5471,7 @@ dependencies = [
  "module-transaction-pause",
  "module-transaction-payment",
  "module-xcm-interface",
+ "module-xnft",
  "nutsfinance-stable-asset",
  "orml-auction",
  "orml-authority",
@@ -5488,7 +5489,6 @@ dependencies = [
  "orml-vesting",
  "orml-xcm",
  "orml-xcm-support",
- "orml-xnft",
  "orml-xtokens",
  "pallet-aura",
  "pallet-authorship",
@@ -7416,6 +7416,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "module-xnft"
+version = "0.4.1-dev"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "log",
+ "module-nft",
+ "orml-nft",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "staging-xcm",
+ "staging-xcm-executor",
+]
+
+[[package]]
 name = "multiaddr"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8249,23 +8269,6 @@ dependencies = [
  "sp-std",
  "staging-xcm",
  "staging-xcm-builder",
- "staging-xcm-executor",
-]
-
-[[package]]
-name = "orml-xnft"
-version = "0.4.1-dev"
-dependencies = [
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
- "staging-xcm",
  "staging-xcm-executor",
 ]
 

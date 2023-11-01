@@ -1316,7 +1316,7 @@ impl orml_nft::Config for Runtime {
 	type MaxTokenMetadata = ConstU32<1024>;
 }
 
-impl orml_xnft::Config for Runtime {
+impl module_xnft::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type NftExecutor = NFT;
 

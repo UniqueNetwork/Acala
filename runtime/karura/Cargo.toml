@@ -100,7 +100,6 @@ orml-xcm = { path = "../../orml/xcm", default-features = false }
 orml-xcm-support = { path = "../../orml/xcm-support", default-features = false }
 orml-xtokens = { path = "../../orml/xtokens", default-features = false }
 
-orml-xnft = { path = "../../orml/xnft", default-features = false }
 
 # modules
 module-aggregated-dex = { path = "../../modules/aggregated-dex", default-features = false }
@@ -132,6 +131,7 @@ module-support = { path = "../../modules/support", default-features = false }
 module-transaction-pause = { path = "../../modules/transaction-pause", default-features = false }
 module-transaction-payment = { path = "../../modules/transaction-payment", default-features = false }
 module-xcm-interface = { path = "../../modules/xcm-interface", default-features = false }
+module-xnft = { path = "../../modules/xnft", default-features = false }
 
 primitives = { package = "acala-primitives", path = "../../primitives", default-features = false }
 runtime-common = { path = "../common", default-features = false }
@@ -224,7 +224,6 @@ std = [
 	"orml-authority/std",
 	"orml-benchmarking/std",
 	"orml-nft/std",
-	"orml-xnft/std",
 	"orml-oracle-runtime-api/std",
 	"orml-oracle/std",
 	"orml-parameters/std",
@@ -260,7 +259,6 @@ std = [
 	"module-idle-scheduler/std",
 	"module-incentives/std",
 	"module-loans/std",
-	"module-nft/std",
 	"module-prices/std",
 	"module-relaychain/std",
 	"module-session-manager/std",
@@ -268,6 +266,7 @@ std = [
 	"module-transaction-pause/std",
 	"module-transaction-payment/std",
 	"module-xcm-interface/std",
+	"module-xnft/std",
 
 	"primitives/std",
 	"runtime-common/std",
@@ -371,7 +370,6 @@ try-runtime = [
 	"orml-auction/try-runtime",
 	"orml-authority/try-runtime",
 	"orml-nft/try-runtime",
-	"orml-xnft/try-runtime",
 	"orml-oracle/try-runtime",
 	"orml-parameters/try-runtime",
 	"orml-rewards/try-runtime",
