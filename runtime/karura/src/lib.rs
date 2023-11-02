@@ -31,6 +31,7 @@
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 use codec::{Decode, DecodeLimit, Encode};
+use runtime_common::EnsureRootOrOneTechnicalCommittee;
 use scale_info::TypeInfo;
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -1318,10 +1319,9 @@ impl orml_nft::Config for Runtime {
 
 impl module_xnft::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-
 	type LocationToAccountId = xcm_config::LocationToAccountId;
-
 	type NtfPalletLocation = xcm_config::NftLocation;
+	type RegisterOrigin = EnsureRootOrOneTechnicalCommittee;
 }
 
 impl InstanceFilter<RuntimeCall> for ProxyType {

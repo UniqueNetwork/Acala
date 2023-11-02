@@ -40,6 +40,8 @@ pub mod pallet {
 		type LocationToAccountId: ConvertLocation<Self::AccountId>;
 
 		type NtfPalletLocation: Get<MultiLocation>;
+
+		type RegisterOrigin: EnsureOrigin<Self::RuntimeOrigin>;
 	}
 
 	/// Error for non-fungible-token module.
@@ -55,7 +57,7 @@ pub mod pallet {
 		TokenIdOf<T>: MaxEncodedLen,
 		ClassIdOf<T>: MaxEncodedLen,
 	{
-		RegisteredAsset {
+		AssetRegistered {
 			asset_id: AssetId,
 			collection_id: ClassIdOf<T>,
 		},
@@ -64,6 +66,10 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn assets)]
 	pub type AssetsMapping<T: Config> = StorageMap<_, Twox64Concat, AssetId, ClassIdOf<T>, OptionQuery>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn classes)]
+	pub type ClassMapping<T: Config> = StorageMap<_, Twox64Concat, ClassIdOf<T>, AssetId, OptionQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn items)]
@@ -82,21 +88,27 @@ pub mod pallet {
 		#[pallet::call_index(0)]
 		#[pallet::weight(0)]
 		pub fn register_asset(origin: OriginFor<T>, foreign_asset: Box<AssetId>) -> DispatchResult {
-			ensure_signed(origin)?;
+			T::RegisterOrigin::ensure_origin(origin)?;
+
 			ensure!(
 				!<AssetsMapping<T>>::contains_key(foreign_asset.as_ref()),
 				<Error<T>>::AssetAlreadyRegistered,
 			);
+
 			let collection_id = module_nft::Pallet::<T>::create_collection(
 				&Self::account_id(),
 				&Self::account_id(),
 				&Default::default(),
 			)?;
+
 			<AssetsMapping<T>>::insert(foreign_asset.as_ref(), collection_id);
-			Self::deposit_event(Event::RegisteredAsset {
+			<ClassMapping<T>>::insert(collection_id, foreign_asset.as_ref());
+
+			Self::deposit_event(Event::AssetRegistered {
 				asset_id: *foreign_asset,
 				collection_id,
 			});
+
 			Ok(())
 		}
 	}

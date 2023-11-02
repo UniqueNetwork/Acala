@@ -78,10 +78,10 @@ impl<T: Config> Create<T::AccountId, Properties> for Pallet<T> {
 	}
 
 	fn create_collection_with_id(
-		collection: Self::CollectionId,
-		who: &T::AccountId,
-		admin: &T::AccountId,
-		config: &Properties,
+		_collection: Self::CollectionId,
+		_who: &T::AccountId,
+		_admin: &T::AccountId,
+		_config: &Properties,
 	) -> Result<(), DispatchError> {
 		unimplemented!()
 	}

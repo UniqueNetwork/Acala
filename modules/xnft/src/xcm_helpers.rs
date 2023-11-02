@@ -30,7 +30,10 @@ where
 			.interior
 			.match_and_split(T::NtfPalletLocation::get().interior())
 		{
-			Some(GeneralIndex(index)) => Some((*index).try_into().ok()?),
+			Some(GeneralIndex(index)) => {
+				let class_id = (*index).try_into().ok()?;
+				Self::classes(class_id).is_none().then_some(class_id)
+			}
 			_ => None,
 		}
 	}
