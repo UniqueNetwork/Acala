@@ -7419,6 +7419,7 @@ dependencies = [
 name = "module-xnft"
 version = "0.4.1-dev"
 dependencies = [
+ "acala-primitives",
  "frame-support",
  "frame-system",
  "log",

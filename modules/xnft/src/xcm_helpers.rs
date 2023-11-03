@@ -1,12 +1,11 @@
 use crate::*;
-use frame_support::traits::Incrementable;
 use xcm::v3::AssetId::Concrete;
 use xcm_executor::traits::Error as MatchError;
 
 impl<T: Config> Pallet<T>
 where
-	TokenIdOf<T>: MaxEncodedLen + Incrementable + TryFrom<u128>,
-	ClassIdOf<T>: MaxEncodedLen + TryFrom<u128>,
+	TokenIdOf<T>: TryFrom<u128>,
+	ClassIdOf<T>: TryFrom<u128>,
 {
 	pub fn asset_to_collection(asset: &AssetId) -> Result<(ClassIdOf<T>, bool), MatchError> {
 		Self::foreign_asset_to_collection(asset)
@@ -53,11 +52,8 @@ where
 
 	pub fn deposit_local_asset(to: &T::AccountId, asset: ClassIdOf<T>, asset_instance: &AssetInstance) -> XcmResult {
 		let token_id = Self::convert_asset_instance(asset_instance)?;
-
-		let current_owner =
-			<ModuleNftPallet<T>>::owner(&asset, &token_id).ok_or(MatchError::InstanceConversionFailed)?;
-		<ModuleNftPallet<T>>::do_transfer(&current_owner, to, (asset, token_id))
-			.map_err(|_| XcmError::LocationNotInvertible)
+		<ModuleNftPallet<T>>::do_transfer(&Self::account_id(), to, (asset, token_id))
+			.map_err(|_| XcmError::FailedToTransactAsset("non-fungible local item deposit failed"))
 	}
 
 	pub fn asset_instance_to_token_id(

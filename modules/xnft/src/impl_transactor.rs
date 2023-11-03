@@ -1,12 +1,11 @@
 use crate::*;
-use frame_support::traits::Incrementable;
 
 const LOG_TARGET: &str = "xcm::module_xnft::transactor";
 
 impl<T: Config> TransactAsset for Pallet<T>
 where
-	TokenIdOf<T>: MaxEncodedLen + Incrementable + TryFrom<u128>,
-	ClassIdOf<T>: MaxEncodedLen + TryFrom<u128>,
+	TokenIdOf<T>: TryFrom<u128>,
+	ClassIdOf<T>: TryFrom<u128>,
 {
 	fn can_check_in(
 		_origin: &xcm::v3::MultiLocation,

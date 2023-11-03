@@ -48,7 +48,6 @@ use sp_runtime::{
 use sp_std::prelude::*;
 
 pub mod benchmarking;
-pub mod impl_nonfungibles;
 mod mock;
 mod tests;
 pub mod weights;

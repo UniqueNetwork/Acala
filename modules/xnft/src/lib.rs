@@ -1,40 +1,34 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::unused_unit)]
 
-use codec::MaxEncodedLen;
-use frame_support::{
-	ensure,
-	pallet_prelude::*,
-	traits::tokens::nonfungibles_v2::{Create, Inspect},
-};
+use frame_support::{ensure, pallet_prelude::*};
 use frame_system::pallet_prelude::*;
 use module_nft::{ClassIdOf, TokenIdOf};
 use sp_runtime::{traits::AccountIdConversion, DispatchResult};
 use sp_std::boxed::Box;
 use xcm::v3::{
-	AssetId, AssetInstance, Error as XcmError, Fungibility, Junction::*, Junctions::*, MultiAsset, MultiLocation,
-	Result as XcmResult,
+	AssetId, AssetInstance, Error as XcmError, Fungibility, Junction::*, MultiAsset, MultiLocation, Result as XcmResult,
 };
 use xcm_executor::traits::{ConvertLocation, Error as XcmExecutorError, TransactAsset};
-pub mod impl_matches;
-pub mod impl_nonfungibles;
+
 pub mod impl_transactor;
-pub mod types;
 pub mod xcm_helpers;
+
 pub use pallet::*;
-pub(crate) use types::*;
+
+pub type ConverterOf<T> = <T as Config>::LocationToAccountId;
+pub type ModuleNftPallet<T> = module_nft::Pallet<T>;
+pub type OrmlNftPallet<T> = orml_nft::Pallet<T>;
 
 #[frame_support::pallet]
 pub mod pallet {
 
+	use primitives::nft::{ClassProperty, Properties};
+
 	use super::*;
 
 	#[pallet::config]
-	pub trait Config: frame_system::Config + module_nft::Config
-	where
-		TokenIdOf<Self>: MaxEncodedLen,
-		ClassIdOf<Self>: MaxEncodedLen,
-	{
+	pub trait Config: frame_system::Config + module_nft::Config {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 
 		type LocationToAccountId: ConvertLocation<Self::AccountId>;
@@ -52,11 +46,7 @@ pub mod pallet {
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(crate) fn deposit_event)]
-	pub enum Event<T: Config>
-	where
-		TokenIdOf<T>: MaxEncodedLen,
-		ClassIdOf<T>: MaxEncodedLen,
-	{
+	pub enum Event<T: Config> {
 		AssetRegistered {
 			asset_id: AssetId,
 			collection_id: ClassIdOf<T>,
@@ -69,7 +59,7 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn classes)]
-	pub type ClassMapping<T: Config> = StorageMap<_, Twox64Concat, ClassIdOf<T>, AssetId, OptionQuery>;
+	pub type ClassesMapping<T: Config> = StorageMap<_, Twox64Concat, ClassIdOf<T>, AssetId, OptionQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn items)]
@@ -80,11 +70,7 @@ pub mod pallet {
 	pub struct Pallet<T>(_);
 
 	#[pallet::call]
-	impl<T: Config> Pallet<T>
-	where
-		TokenIdOf<T>: MaxEncodedLen + Default,
-		ClassIdOf<T>: MaxEncodedLen,
-	{
+	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(0)]
 		pub fn register_asset(origin: OriginFor<T>, foreign_asset: Box<AssetId>) -> DispatchResult {
@@ -95,14 +81,17 @@ pub mod pallet {
 				<Error<T>>::AssetAlreadyRegistered,
 			);
 
-			let collection_id = module_nft::Pallet::<T>::create_collection(
-				&Self::account_id(),
-				&Self::account_id(),
-				&Default::default(),
-			)?;
+			let properties =
+				Properties(ClassProperty::Mintable | ClassProperty::Burnable | ClassProperty::Transferable);
+			let data = module_nft::ClassData {
+				deposit: Default::default(),
+				properties,
+				attributes: Default::default(),
+			};
+			let collection_id = orml_nft::Pallet::<T>::create_class(&Self::account_id(), Default::default(), data)?;
 
 			<AssetsMapping<T>>::insert(foreign_asset.as_ref(), collection_id);
-			<ClassMapping<T>>::insert(collection_id, foreign_asset.as_ref());
+			<ClassesMapping<T>>::insert(collection_id, foreign_asset.as_ref());
 
 			Self::deposit_event(Event::AssetRegistered {
 				asset_id: *foreign_asset,
@@ -114,11 +103,7 @@ pub mod pallet {
 	}
 }
 
-impl<T: Config> Pallet<T>
-where
-	TokenIdOf<T>: MaxEncodedLen + Default,
-	ClassIdOf<T>: MaxEncodedLen,
-{
+impl<T: Config> Pallet<T> {
 	pub fn account_id() -> T::AccountId {
 		frame_support::PalletId(*b"poc_xnft").into_account_truncating()
 	}
