@@ -123,6 +123,6 @@ pub mod pallet {
 
 impl<T: Config> Pallet<T> {
 	pub fn account_id() -> T::AccountId {
-		frame_support::PalletId(*b"poc_xnft").into_account_truncating()
+		frame_support::PalletId(*b"mvp_xnft").into_account_truncating()
 	}
 }
