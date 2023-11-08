@@ -73,7 +73,7 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn assets)]
-	pub type AssetsMapping<T: Config> = StorageMap<_, Twox64Concat, AssetId, ClassIdOf<T>, OptionQuery>;
+	pub type AssetsMapping<T: Config> = StorageMap<_, Twox64Concat, staging_xcm::v3::AssetId, ClassIdOf<T>, OptionQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn classes)]
