@@ -45,13 +45,13 @@ where
 
 	fn check_out(_dest: &xcm::v3::MultiLocation, _what: &MultiAsset, _context: &xcm::v3::XcmContext) {}
 
-	fn deposit_asset(what: &MultiAsset, who: &xcm::v3::MultiLocation, _context: &xcm::v3::XcmContext) -> XcmResult {
+	fn deposit_asset(what: &MultiAsset, who: &xcm::v3::MultiLocation, context: &xcm::v3::XcmContext) -> XcmResult {
 		log::trace!(
 			target: LOG_TARGET,
 			"deposit_asset what: {:?}, who: {:?}, context: {:?}",
 			what,
 			who,
-			_context,
+			context,
 		);
 
 		let Fungibility::NonFungible(asset_instance) = what.fun else {
@@ -74,14 +74,14 @@ where
 	fn withdraw_asset(
 		what: &MultiAsset,
 		who: &xcm::v3::MultiLocation,
-		_maybe_context: Option<&xcm::v3::XcmContext>,
+		maybe_context: Option<&xcm::v3::XcmContext>,
 	) -> Result<xcm_executor::Assets, xcm::v3::Error> {
 		log::trace!(
 			target: LOG_TARGET,
 			"withdraw_asset what: {:?}, who: {:?}, maybe_context: {:?}",
 			what,
 			who,
-			_maybe_context,
+			maybe_context,
 		);
 
 		let Fungibility::NonFungible(asset_instance) = what.fun else {
@@ -104,7 +104,7 @@ where
 		asset: &MultiAsset,
 		from: &xcm::v3::MultiLocation,
 		to: &xcm::v3::MultiLocation,
-		_context: &xcm::v3::XcmContext,
+		context: &xcm::v3::XcmContext,
 	) -> Result<xcm_executor::Assets, xcm::v3::Error> {
 		log::trace!(
 			target: LOG_TARGET,
@@ -112,7 +112,7 @@ where
 			asset,
 			from,
 			to,
-			_context
+			context
 		);
 
 		let Fungibility::NonFungible(asset_instance) = asset.fun else {

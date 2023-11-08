@@ -26,17 +26,13 @@ where
 	ClassIdOf<T>: TryFrom<u128>,
 {
 	pub fn asset_to_collection(asset: &AssetId) -> Result<(ClassIdOf<T>, bool), MatchError> {
-		Self::foreign_asset_to_collection(asset)
+		Self::foreign_asset_to_class(asset)
 			.map(|a| (a, true))
-			.or_else(|| Self::local_asset_to_collection(asset).map(|a| (a, false)))
+			.or_else(|| Self::local_asset_to_class(asset).map(|a| (a, false)))
 			.ok_or(MatchError::AssetIdConversionFailed)
 	}
 
-	pub fn foreign_asset_to_collection(asset: &AssetId) -> Option<ClassIdOf<T>> {
-		Self::assets(asset)
-	}
-
-	pub fn local_asset_to_collection(asset: &AssetId) -> Option<ClassIdOf<T>> {
+	pub fn local_asset_to_class(asset: &AssetId) -> Option<ClassIdOf<T>> {
 		let Concrete(asset_location) = asset else {
 			return None;
 		};
@@ -49,20 +45,20 @@ where
 		{
 			Some(GeneralIndex(index)) => {
 				let class_id = (*index).try_into().ok()?;
-				Self::classes(class_id).is_none().then_some(class_id)
+				Self::class_to_foreign_asset(class_id).is_none().then_some(class_id)
 			}
 			_ => None,
 		}
 	}
 
 	pub fn deposit_foreign_asset(to: &T::AccountId, asset: ClassIdOf<T>, asset_instance: &AssetInstance) -> XcmResult {
-		match Self::items(asset, asset_instance) {
+		match Self::asset_instance_to_item(asset, asset_instance) {
 			Some(token_id) => <ModuleNftPallet<T>>::do_transfer(&Self::account_id(), to, (asset, token_id))
 				.map_err(|_| XcmError::FailedToTransactAsset("non-fungible foreign item deposit failed")),
 			None => {
 				let token_id = <OrmlNftPallet<T>>::mint(to, asset, Default::default(), Default::default())
 					.map_err(|_| XcmError::FailedToTransactAsset("non-fungible new foreign item deposit failed"))?;
-				<ItemsMapping<T>>::insert(asset, asset_instance, token_id);
+				<AssetInstanceToItem<T>>::insert(asset, asset_instance, token_id);
 				Ok(())
 			}
 		}
@@ -80,7 +76,7 @@ where
 		asset_instance: &AssetInstance,
 	) -> Option<TokenIdOf<T>> {
 		match is_foreign_asset {
-			true => Self::items(class_id, asset_instance),
+			true => Self::asset_instance_to_item(class_id, asset_instance),
 			false => Self::convert_asset_instance(asset_instance).ok(),
 		}
 	}

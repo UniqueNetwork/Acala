@@ -41,9 +41,9 @@ pub type OrmlNftPallet<T> = orml_nft::Pallet<T>;
 #[frame_support::pallet]
 pub mod pallet {
 
-	use primitives::nft::{ClassProperty, Properties};
-
 	use super::*;
+	use module_nft::WeightInfo as _;
+	use primitives::nft::{ClassProperty, Properties};
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config + module_nft::Config {
@@ -66,23 +66,42 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(crate) fn deposit_event)]
 	pub enum Event<T: Config> {
 		AssetRegistered {
-			asset_id: AssetId,
+			asset_id: Box<AssetId>,
 			collection_id: ClassIdOf<T>,
 		},
 	}
 
 	#[pallet::storage]
-	#[pallet::getter(fn assets)]
-	pub type AssetsMapping<T: Config> = StorageMap<_, Twox64Concat, staging_xcm::v3::AssetId, ClassIdOf<T>, OptionQuery>;
+	#[pallet::getter(fn foreign_asset_to_class)]
+	pub type ForeignAssetToClass<T: Config> = StorageMap<_, Twox64Concat, xcm::v3::AssetId, ClassIdOf<T>, OptionQuery>;
+	// -//-
+	#[pallet::storage]
+	#[pallet::getter(fn class_to_foreign_asset)]
+	pub type ClassToForeignAsset<T: Config> = StorageMap<_, Twox64Concat, ClassIdOf<T>, xcm::v3::AssetId, OptionQuery>;
 
 	#[pallet::storage]
-	#[pallet::getter(fn classes)]
-	pub type ClassesMapping<T: Config> = StorageMap<_, Twox64Concat, ClassIdOf<T>, AssetId, OptionQuery>;
+	#[pallet::getter(fn asset_instance_to_item)]
+	pub type AssetInstanceToItem<T: Config> = StorageDoubleMap<
+		_,
+		Twox64Concat,
+		ClassIdOf<T>,
+		Twox64Concat,
+		xcm::v3::AssetInstance,
+		TokenIdOf<T>,
+		OptionQuery,
+	>;
 
 	#[pallet::storage]
-	#[pallet::getter(fn items)]
-	pub type ItemsMapping<T: Config> =
-		StorageDoubleMap<_, Twox64Concat, ClassIdOf<T>, Twox64Concat, AssetInstance, TokenIdOf<T>, OptionQuery>;
+	#[pallet::getter(fn item_to_asset_instance)]
+	pub type ItemToAssetInstance<T: Config> = StorageDoubleMap<
+		_,
+		Twox64Concat,
+		ClassIdOf<T>,
+		Twox64Concat,
+		TokenIdOf<T>,
+		xcm::v3::AssetInstance,
+		OptionQuery,
+	>;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -90,12 +109,15 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
-		#[pallet::weight(0)]
+		#[pallet::weight(Weight::from_parts(1_000_000, 0)
+			.saturating_add(<module_nft::weights::AcalaWeight<T>>::create_class())
+			.saturating_add(T::DbWeight::get().reads(1))
+			.saturating_add(T::DbWeight::get().writes(2)))]
 		pub fn register_asset(origin: OriginFor<T>, foreign_asset: Box<AssetId>) -> DispatchResult {
 			T::RegisterOrigin::ensure_origin(origin)?;
 
 			ensure!(
-				!<AssetsMapping<T>>::contains_key(foreign_asset.as_ref()),
+				!<ForeignAssetToClass<T>>::contains_key(foreign_asset.as_ref()),
 				<Error<T>>::AssetAlreadyRegistered,
 			);
 
@@ -108,11 +130,11 @@ pub mod pallet {
 			};
 			let collection_id = orml_nft::Pallet::<T>::create_class(&Self::account_id(), Default::default(), data)?;
 
-			<AssetsMapping<T>>::insert(foreign_asset.as_ref(), collection_id);
-			<ClassesMapping<T>>::insert(collection_id, foreign_asset.as_ref());
+			<ForeignAssetToClass<T>>::insert(foreign_asset.as_ref(), collection_id);
+			<ClassToForeignAsset<T>>::insert(collection_id, foreign_asset.as_ref());
 
 			Self::deposit_event(Event::AssetRegistered {
-				asset_id: *foreign_asset,
+				asset_id: foreign_asset,
 				collection_id,
 			});
 
