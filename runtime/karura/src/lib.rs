@@ -1320,6 +1320,7 @@ impl orml_nft::Config for Runtime {
 impl module_xnft::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type LocationToAccountId = xcm_config::LocationToAccountId;
+	type SelfParaId = ParachainInfo;
 	type NtfPalletLocation = xcm_config::NftLocation;
 	type RegisterOrigin = EnsureRootOrOneTechnicalCommittee;
 }

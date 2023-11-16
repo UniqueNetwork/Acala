@@ -36,13 +36,18 @@ where
 		let Concrete(asset_location) = asset else {
 			return None;
 		};
-		if asset_location.parents != T::NtfPalletLocation::get().parents {
+
+		let prefix = if asset_location.parents == 0 {
+			T::NtfPalletLocation::get()
+		} else if asset_location.parents == 1 {
+			T::NtfPalletLocation::get()
+				.pushed_front_with(Parachain(T::SelfParaId::get().into()))
+				.ok()?
+		} else {
 			return None;
-		}
-		match asset_location
-			.interior
-			.match_and_split(T::NtfPalletLocation::get().interior())
-		{
+		};
+
+		match asset_location.interior.match_and_split(&prefix) {
 			Some(GeneralIndex(index)) => {
 				let class_id = (*index).try_into().ok()?;
 				Self::class_to_foreign_asset(class_id).is_none().then_some(class_id)

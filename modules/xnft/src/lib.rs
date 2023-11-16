@@ -19,13 +19,15 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::unused_unit)]
 
+use cumulus_primitives_core::ParaId;
 use frame_support::{ensure, pallet_prelude::*};
 use frame_system::pallet_prelude::*;
 use module_nft::{ClassIdOf, TokenIdOf};
 use sp_runtime::{traits::AccountIdConversion, DispatchResult};
 use sp_std::boxed::Box;
 use xcm::v3::{
-	AssetId, AssetInstance, Error as XcmError, Fungibility, Junction::*, MultiAsset, MultiLocation, Result as XcmResult,
+	AssetId, AssetInstance, Error as XcmError, Fungibility, InteriorMultiLocation, Junction::*, MultiAsset,
+	Result as XcmResult,
 };
 use xcm_executor::traits::{ConvertLocation, Error as XcmExecutorError, TransactAsset};
 
@@ -51,7 +53,9 @@ pub mod pallet {
 
 		type LocationToAccountId: ConvertLocation<Self::AccountId>;
 
-		type NtfPalletLocation: Get<MultiLocation>;
+		type SelfParaId: Get<ParaId>;
+
+		type NtfPalletLocation: Get<InteriorMultiLocation>;
 
 		type RegisterOrigin: EnsureOrigin<Self::RuntimeOrigin>;
 	}

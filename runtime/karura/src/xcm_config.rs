@@ -45,7 +45,7 @@ parameter_types! {
 	pub const RelayNetwork: NetworkId = NetworkId::Kusama;
 	pub RelayChainOrigin: RuntimeOrigin = cumulus_pallet_xcm::Origin::Relay.into();
 	pub UniversalLocation: InteriorMultiLocation = X2(GlobalConsensus(RelayNetwork::get()), Parachain(ParachainInfo::parachain_id().into()));
-	pub NftLocation: MultiLocation = MultiLocation::new(1, X2(Parachain(ParachainInfo::get().into()), PalletInstance(121)));
+	pub NftLocation: InteriorMultiLocation = X1(PalletInstance(121));
 	pub CheckingAccount: AccountId = PolkadotXcm::check_account();
 }
 
