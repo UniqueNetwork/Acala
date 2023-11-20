@@ -78,7 +78,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn foreign_asset_to_class)]
 	pub type ForeignAssetToClass<T: Config> = StorageMap<_, Twox64Concat, xcm::v3::AssetId, ClassIdOf<T>, OptionQuery>;
-	// -//-
+
 	#[pallet::storage]
 	#[pallet::getter(fn class_to_foreign_asset)]
 	pub type ClassToForeignAsset<T: Config> = StorageMap<_, Twox64Concat, ClassIdOf<T>, xcm::v3::AssetId, OptionQuery>;
