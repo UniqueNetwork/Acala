@@ -38,7 +38,7 @@ use runtime_common::{
 	local_currency_location, native_currency_location, AcalaDropAssets, EnsureRootOrHalfGeneralCouncil,
 	EnsureRootOrThreeFourthsGeneralCouncil,
 };
-use xcm::{prelude::*, v3::Junctions::X2, v3::Weight as XcmWeight};
+use xcm::{prelude::*, v3::Weight as XcmWeight};
 use xcm_builder::{EnsureXcmOrigin, FixedRateOfFungible, FixedWeightBounds, SignedToAccountId32};
 
 parameter_types! {
