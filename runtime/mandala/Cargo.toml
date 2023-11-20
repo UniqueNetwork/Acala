@@ -8,16 +8,9 @@ build = "build.rs"
 [dependencies]
 log = { version = "0.4.17", default-features = false }
 smallvec = "1.4.0"
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
-	"derive",
-	"max-encoded-len",
-] }
-scale-info = { version = "2.9.0", default-features = false, features = [
-	"derive",
-] }
-serde_json = { version = "1.0.85", default-features = false, features = [
-	"alloc",
-] }
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive", "max-encoded-len"] }
+scale-info = { version = "2.9.0", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0.85", default-features = false, features = ["alloc"] }
 hex = { version = "0.4", default-features = false }
 hex-literal = { version = "0.4.1" }
 
@@ -27,12 +20,12 @@ frame-support = { git = "https://github.com/paritytech/polkadot-sdk", branch = "
 frame-system = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 frame-try-runtime = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false, optional = true }
-pallet-aura = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-pallet-authorship = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-aura = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-authorship = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false}
 pallet-balances = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-bounties = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-collective = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-pallet-democracy = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-democracy = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features =false }
 pallet-elections-phragmen = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-indices = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-membership = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
@@ -40,9 +33,7 @@ pallet-multisig = { git = "https://github.com/paritytech/polkadot-sdk", branch =
 pallet-proxy = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-recovery = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-root-testing = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-pallet-session = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false, features = [
-	"historical",
-] }
+pallet-session = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false, features = ["historical"] }
 pallet-scheduler = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-sudo = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-timestamp = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
@@ -89,7 +80,7 @@ pallet-xcm = { git = "https://github.com/paritytech/polkadot-sdk", branch = "rel
 orml-auction = { path = "../../orml/auction", default-features = false }
 orml-authority = { path = "../../orml/authority", default-features = false }
 orml-benchmarking = { path = "../../orml/benchmarking", default-features = false, optional = true }
-orml-nft = { path = "../../orml/nft", default-features = false }
+orml-nft= { path = "../../orml/nft", default-features = false }
 orml-oracle = { path = "../../orml/oracle", default-features = false }
 orml-oracle-runtime-api = { path = "../../orml/oracle/runtime-api", default-features = false }
 orml-parameters = { path = "../../orml/parameters", default-features = false }
@@ -121,7 +112,7 @@ module-earning = { path = "../../modules/earning", default-features = false }
 module-evm = { path = "../../modules/evm", default-features = false }
 module-evm-accounts = { path = "../../modules/evm-accounts", default-features = false }
 module-evm-bridge = { path = "../../modules/evm-bridge", default-features = false }
-module-evm-rpc-runtime-api = { path = "../../modules/evm/rpc/runtime_api", default-features = false }
+module-evm-rpc-runtime-api = { path = "../../modules/evm/rpc/runtime_api",  default-features = false }
 module-evm-utility = { path = "../../modules/evm-utility", default-features = false }
 module-honzon = { path = "../../modules/honzon", default-features = false }
 module-loans = { path = "../../modules/loans", default-features = false }
@@ -160,9 +151,7 @@ sp-keyring = { git = "https://github.com/paritytech/polkadot-sdk", branch = "rel
 cumulus-primitives-parachain-inherent = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 cumulus-test-relay-sproof-builder = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 
-acala-service = { path = "../../node/service", features = [
-	"with-mandala-runtime",
-] }
+acala-service = { path = "../../node/service", features = ["with-mandala-runtime"] }
 
 [features]
 default = ["std"]
@@ -354,7 +343,9 @@ disable-runtime-api = []
 # A feature that should be enabled when the runtime should be build for on-chain
 # deployment. This will disable stuff that shouldn't be part of the on-chain wasm
 # to make it smaller like logging for example.
-on-chain-release-build = ["sp-api/disable-logging"]
+on-chain-release-build = [
+	"sp-api/disable-logging",
+]
 with-ethereum-compatibility = [
 	"module-evm/with-ethereum-compatibility",
 	"runtime-common/with-ethereum-compatibility",
