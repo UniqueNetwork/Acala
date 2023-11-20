@@ -7417,7 +7417,7 @@ dependencies = [
 
 [[package]]
 name = "module-xnft"
-version = "0.4.1-dev"
+version = "0.1.0-dev"
 dependencies = [
  "acala-primitives",
  "cumulus-primitives-core",
@@ -7428,9 +7428,6 @@ dependencies = [
  "orml-nft",
  "parity-scale-codec",
  "scale-info",
- "serde",
- "sp-core",
- "sp-io",
  "sp-runtime",
  "sp-std",
  "staging-xcm",

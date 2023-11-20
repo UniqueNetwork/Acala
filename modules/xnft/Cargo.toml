@@ -1,8 +1,8 @@
 [package]
 name = "module-xnft"
-description = "XCM NFT MVP"
+description = "XCM NFT PoC"
 license = "Apache-2.0"
-version = "0.4.1-dev"
+version = "0.1.0-dev"
 authors = ["Unique Developers"]
 edition = "2021"
 
@@ -13,7 +13,6 @@ codec = { package = "parity-scale-codec", version = "3.0.0", default-features = 
 scale-info = { version = "2.9.0", default-features = false, features = [
 	"derive",
 ] }
-serde = { version = "1.0.136", optional = true }
 
 frame-support = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 frame-system = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
@@ -31,15 +30,9 @@ orml-nft = { path = "../../orml/nft", default-features = false }
 
 log = { version = "0.4.17", default-features = false }
 
-[dev-dependencies]
-sp-core = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
-sp-io = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
-
 [features]
 default = ["std"]
 std = [
-	"serde",
-
 	"codec/std",
 	"frame-support/std",
 	"frame-system/std",
