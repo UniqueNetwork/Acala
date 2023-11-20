@@ -32,7 +32,7 @@ where
 			.ok_or(MatchError::AssetIdConversionFailed)
 	}
 
-	pub fn local_asset_to_class(asset: &AssetId) -> Option<ClassIdOf<T>> {
+	fn local_asset_to_class(asset: &AssetId) -> Option<ClassIdOf<T>> {
 		let Concrete(asset_location) = asset else {
 			return None;
 		};
@@ -85,7 +85,8 @@ where
 			false => Self::convert_asset_instance(asset_instance).ok(),
 		}
 	}
-	pub fn convert_asset_instance(asset: &AssetInstance) -> Result<TokenIdOf<T>, MatchError> {
+
+	fn convert_asset_instance(asset: &AssetInstance) -> Result<TokenIdOf<T>, MatchError> {
 		let AssetInstance::Index(index) = asset else {
 			return Err(MatchError::InstanceConversionFailed);
 		};
