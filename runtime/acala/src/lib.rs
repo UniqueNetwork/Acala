@@ -50,7 +50,6 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
-use cumulus_pallet_parachain_system::RelaychainDataProvider;
 use frame_system::{EnsureRoot, EnsureSigned, RawOrigin};
 use module_asset_registry::{AssetIdMaps, EvmErc20InfoMapping};
 use module_cdp_engine::CollateralCurrencyIds;
@@ -60,6 +59,8 @@ use module_evm_accounts::EvmAddressMapping;
 use module_relaychain::RelayChainCallBuilder;
 use module_support::{AssetIdMapping, DispatchableTask, PoolId};
 use module_transaction_payment::TargetedFeeAdjustment;
+
+use cumulus_pallet_parachain_system::RelaychainDataProvider;
 use orml_traits::{
 	create_median_value_data_provider, define_aggregrated_parameters, parameter_type_with_key,
 	parameters::ParameterStoreAdapter, DataFeeder, DataProviderExtended,
