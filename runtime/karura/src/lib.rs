@@ -43,8 +43,8 @@ use sp_runtime::{
 		IdentityLookup, SaturatedConversion, StaticLookup,
 	},
 	transaction_validity::{TransactionSource, TransactionValidity},
-	ApplyExtrinsicResult, ArithmeticError, DispatchResult, FixedPointNumber, Perbill, Percent, Permill, Perquintill,
-	RuntimeDebug,
+	ApplyExtrinsicResult, ArithmeticError, DispatchError, DispatchResult, FixedPointNumber, Perbill, Percent, Permill,
+	Perquintill, RuntimeDebug,
 };
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
@@ -68,6 +68,10 @@ use orml_traits::{
 };
 use orml_utilities::simulate_execution;
 use pallet_transaction_payment::RuntimeDispatchInfo;
+use pallet_xnft::{
+	misc::{ForceRegisterOrigin, GeneralIndexCollectionId, IndexAssetInstance},
+	traits::{DerivativeWithdrawal, NftPallet},
+};
 
 use frame_support::{
 	construct_runtime,
@@ -1344,6 +1348,80 @@ impl module_xnft::Config for Runtime {
 	type RegisterOrigin = EnsureRootOrOneTechnicalCommittee;
 }
 
+parameter_types! {
+	pub DerivativeClassData: module_nft::ClassData<Balance> = {
+		use primitives::nft::{ClassProperty, Properties, Attributes};
+
+		module_nft::ClassData::<Balance> {
+			deposit: 0u128,
+			properties: Properties(ClassProperty::Mintable | ClassProperty::Burnable | ClassProperty::Transferable),
+			attributes: Attributes::new(),
+		}
+	};
+	pub DerivativeTokenData: module_nft::TokenData<Balance> = {
+		use primitives::nft::Attributes;
+
+		module_nft::TokenData::<Balance> {
+			deposit: 0u128,
+			attributes: Attributes::new(),
+		}
+	};
+}
+
+pub type XnftOrml = orml_nft::xnft::XnftAdapter<
+	Runtime,
+	GeneralIndexCollectionId<<Runtime as orml_nft::Config>::ClassId>,
+	IndexAssetInstance<<Runtime as orml_nft::Config>::TokenId>,
+	DerivativeClassData,
+	DerivativeTokenData,
+>;
+
+impl NftPallet<Runtime> for module_nft::Pallet<Runtime> {
+	type CollectionId = <XnftOrml as NftPallet<Runtime>>::CollectionId;
+	type TokenId = <XnftOrml as NftPallet<Runtime>>::TokenId;
+	type PalletDispatchErrors = <XnftOrml as NftPallet<Runtime>>::PalletDispatchErrors;
+
+	fn create_derivative_collection(
+		owner: &<Runtime as frame_system::Config>::AccountId,
+	) -> Result<Self::CollectionId, DispatchError> {
+		XnftOrml::create_derivative_collection(owner)
+	}
+
+	fn mint_derivative(
+		collection_id: &Self::CollectionId,
+		to: &<Runtime as frame_system::Config>::AccountId,
+	) -> Result<Self::TokenId, DispatchError> {
+		XnftOrml::mint_derivative(collection_id, to)
+	}
+
+	fn withdraw_derivative(
+		collection_id: &Self::CollectionId,
+		token_id: &Self::TokenId,
+		from: &<Runtime as frame_system::Config>::AccountId,
+	) -> Result<DerivativeWithdrawal, DispatchError> {
+		XnftOrml::withdraw_derivative(collection_id, token_id, from)
+	}
+
+	fn transfer(
+		collection_id: &Self::CollectionId,
+		token_id: &Self::TokenId,
+		from: &<Runtime as frame_system::Config>::AccountId,
+		to: &<Runtime as frame_system::Config>::AccountId,
+	) -> DispatchResult {
+		module_nft::Pallet::<Runtime>::do_transfer(from, to, (**collection_id, **token_id))
+	}
+}
+
+impl pallet_xnft::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type UniversalLocation = xcm_config::UniversalLocation;
+	type PalletId = XnftPalletId;
+	type NftCollectionsLocation = xcm_config::NftPalletLocation;
+	type LocationToAccountId = xcm_config::LocationToAccountId;
+	type NftPallet = module_nft::Pallet<Runtime>;
+	type RegisterOrigin = ForceRegisterOrigin<EnsureRootOrOneTechnicalCommittee>;
+}
+
 impl InstanceFilter<RuntimeCall> for ProxyType {
 	fn filter(&self, c: &RuntimeCall) -> bool {
 		match self {
@@ -1844,7 +1922,8 @@ construct_runtime!(
 		Incentives: module_incentives = 120,
 		NFT: module_nft = 121,
 		AssetRegistry: module_asset_registry = 122,
-		XNFT: module_xnft = 123,
+		XnftPoC: module_xnft = 123,
+		XNFT: pallet_xnft = 124,
 
 		// Smart contracts
 		EVM: module_evm = 130,

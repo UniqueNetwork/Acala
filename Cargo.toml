@@ -222,6 +222,8 @@ module-transaction-payment = { path = "modules/transaction-payment", default-fea
 module-xcm-interface = { path = "modules/xcm-interface", default-features = false }
 nutsfinance-stable-asset = { version = "0.1.0", path = "ecosystem-modules/stable-asset/lib/stable-asset", default-features = false}
 
+pallet-xnft = { git = "https://github.com/UniqueNetwork/xnft.git", branch = "initial-code", default-features = false }
+
 # ORML & Acala (client)
 acala-cli = { path = "node/cli" }
 acala-rpc = { path = "rpc" }
