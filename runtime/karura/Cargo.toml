@@ -312,6 +312,7 @@ runtime-benchmarks = [
 	"module-evm-bridge/runtime-benchmarks",
 	"module-homa/runtime-benchmarks",
 	"module-nft/runtime-benchmarks",
+	"pallet-xnft/runtime-benchmarks",
 	"module-xcm-interface/runtime-benchmarks",
 
 	"nutsfinance-stable-asset/runtime-benchmarks",
