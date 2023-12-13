@@ -1349,15 +1349,6 @@ impl module_xnft::Config for Runtime {
 }
 
 parameter_types! {
-	pub DerivativeClassData: module_nft::ClassData<Balance> = {
-		use primitives::nft::{ClassProperty, Properties, Attributes};
-
-		module_nft::ClassData::<Balance> {
-			deposit: 0u128,
-			properties: Properties(ClassProperty::Mintable | ClassProperty::Burnable | ClassProperty::Transferable),
-			attributes: Attributes::new(),
-		}
-	};
 	pub DerivativeTokenData: module_nft::TokenData<Balance> = {
 		use primitives::nft::Attributes;
 
@@ -1372,7 +1363,6 @@ pub type XnftOrml = orml_nft::xnft::XnftAdapter<
 	Runtime,
 	GeneralIndexCollectionId<<Runtime as orml_nft::Config>::ClassId>,
 	IndexAssetInstance<<Runtime as orml_nft::Config>::TokenId>,
-	DerivativeClassData,
 	DerivativeTokenData,
 >;
 
@@ -1380,11 +1370,13 @@ impl NftInterface<Runtime> for module_nft::Pallet<Runtime> {
 	type CollectionId = <XnftOrml as NftInterface<Runtime>>::CollectionId;
 	type TokenId = <XnftOrml as NftInterface<Runtime>>::TokenId;
 	type PalletDispatchErrors = <XnftOrml as NftInterface<Runtime>>::PalletDispatchErrors;
+	type DerivativeCollectionData = <XnftOrml as NftInterface<Runtime>>::DerivativeCollectionData;
 
 	fn create_derivative_collection(
 		owner: &<Runtime as frame_system::Config>::AccountId,
+		class_data: Self::DerivativeCollectionData,
 	) -> Result<Self::CollectionId, DispatchError> {
-		XnftOrml::create_derivative_collection(owner)
+		XnftOrml::create_derivative_collection(owner, class_data)
 	}
 
 	fn mint_derivative(
