@@ -70,7 +70,7 @@ use orml_utilities::simulate_execution;
 use pallet_transaction_payment::RuntimeDispatchInfo;
 use pallet_xnft::{
 	misc::{ForceRegisterOrigin, GeneralIndexCollectionId, IndexAssetInstance},
-	traits::{DerivativeWithdrawal, NftPallet},
+	traits::{DerivativeWithdrawal, NftInterface},
 };
 
 use frame_support::{
@@ -1376,10 +1376,10 @@ pub type XnftOrml = orml_nft::xnft::XnftAdapter<
 	DerivativeTokenData,
 >;
 
-impl NftPallet<Runtime> for module_nft::Pallet<Runtime> {
-	type CollectionId = <XnftOrml as NftPallet<Runtime>>::CollectionId;
-	type TokenId = <XnftOrml as NftPallet<Runtime>>::TokenId;
-	type PalletDispatchErrors = <XnftOrml as NftPallet<Runtime>>::PalletDispatchErrors;
+impl NftInterface<Runtime> for module_nft::Pallet<Runtime> {
+	type CollectionId = <XnftOrml as NftInterface<Runtime>>::CollectionId;
+	type TokenId = <XnftOrml as NftInterface<Runtime>>::TokenId;
+	type PalletDispatchErrors = <XnftOrml as NftInterface<Runtime>>::PalletDispatchErrors;
 
 	fn create_derivative_collection(
 		owner: &<Runtime as frame_system::Config>::AccountId,
@@ -1418,7 +1418,7 @@ impl pallet_xnft::Config for Runtime {
 	type PalletId = XnftPalletId;
 	type NftCollectionsLocation = xcm_config::NftPalletLocation;
 	type LocationToAccountId = xcm_config::LocationToAccountId;
-	type NftPallet = module_nft::Pallet<Runtime>;
+	type NftInterface = module_nft::Pallet<Runtime>;
 	type RegisterOrigin = ForceRegisterOrigin<EnsureRootOrOneTechnicalCommittee>;
 }
 
