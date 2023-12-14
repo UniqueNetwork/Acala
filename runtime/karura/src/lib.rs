@@ -30,7 +30,9 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
+use module_nft::ClassData;
 use parity_scale_codec::{Decode, DecodeLimit, Encode};
+use primitives::nft::{Attributes, ClassProperty, Properties};
 use runtime_common::EnsureRootOrOneTechnicalCommittee;
 use scale_info::TypeInfo;
 use sp_api::impl_runtime_apis;
@@ -69,7 +71,7 @@ use orml_traits::{
 use orml_utilities::simulate_execution;
 use pallet_transaction_payment::RuntimeDispatchInfo;
 use pallet_xnft::{
-	misc::{ForceRegisterOrigin, GeneralIndexCollectionId, IndexAssetInstance},
+	misc::{GeneralIndexCollectionId, IndexAssetInstance},
 	traits::{DerivativeWithdrawal, NftInterface},
 };
 
@@ -80,9 +82,9 @@ use frame_support::{
 	traits::{
 		fungible::HoldConsideration,
 		tokens::{PayFromAccount, UnityAssetBalanceConversion},
-		ConstBool, ConstU128, ConstU32, Contains, ContainsLengthBound, Currency as PalletCurrency, Currency,
-		EnsureOrigin, EqualPrivilegeOnly, Get, Imbalance, InstanceFilter, LinearStoragePrice, LockIdentifier,
-		OnRuntimeUpgrade, OnUnbalanced, SortedMembers,
+		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU32, Contains, ContainsLengthBound,
+		Currency as PalletCurrency, Currency, EnsureOrigin, EqualPrivilegeOnly, Get, Imbalance, InstanceFilter,
+		LinearStoragePrice, LockIdentifier, OnRuntimeUpgrade, OnUnbalanced, SortedMembers,
 	},
 	weights::{constants::RocksDbWeight, ConstantMultiplier, Weight},
 	PalletId,
@@ -1370,13 +1372,20 @@ impl NftInterface<Runtime> for module_nft::Pallet<Runtime> {
 	type CollectionId = <XnftOrml as NftInterface<Runtime>>::CollectionId;
 	type TokenId = <XnftOrml as NftInterface<Runtime>>::TokenId;
 	type PalletDispatchErrors = <XnftOrml as NftInterface<Runtime>>::PalletDispatchErrors;
-	type DerivativeCollectionData = <XnftOrml as NftInterface<Runtime>>::DerivativeCollectionData;
+	type DerivativeCollectionData = Attributes;
 
 	fn create_derivative_collection(
 		owner: &<Runtime as frame_system::Config>::AccountId,
-		class_data: Self::DerivativeCollectionData,
+		attributes: Self::DerivativeCollectionData,
 	) -> Result<Self::CollectionId, DispatchError> {
-		XnftOrml::create_derivative_collection(owner, class_data)
+		XnftOrml::create_derivative_collection(
+			owner,
+			ClassData {
+				deposit: 0,
+				properties: Properties(ClassProperty::Mintable | ClassProperty::Burnable | ClassProperty::Transferable),
+				attributes,
+			},
+		)
 	}
 
 	fn mint_derivative(
@@ -1411,7 +1420,7 @@ impl pallet_xnft::Config for Runtime {
 	type NftCollectionsLocation = xcm_config::NftPalletLocation;
 	type LocationToAccountId = xcm_config::LocationToAccountId;
 	type NftInterface = module_nft::Pallet<Runtime>;
-	type RegisterOrigin = ForceRegisterOrigin<EnsureRootOrOneTechnicalCommittee>;
+	type RegisterOrigin = AsEnsureOriginWithArg<EnsureRootOrOneTechnicalCommittee>;
 }
 
 impl InstanceFilter<RuntimeCall> for ProxyType {
