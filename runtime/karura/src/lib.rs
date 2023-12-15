@@ -59,6 +59,7 @@ use module_cdp_engine::CollateralCurrencyIds;
 use module_currencies::BasicCurrencyAdapter;
 use module_evm::{runner::RunnerExtended, CallInfo, CreateInfo, EvmChainId, EvmTask};
 use module_evm_accounts::EvmAddressMapping;
+use module_nft::WeightInfo;
 use module_relaychain::RelayChainCallBuilder;
 use module_support::{AssetIdMapping, DispatchableTask, ExchangeRateProvider, FractionalRate, PoolId};
 use module_transaction_payment::TargetedFeeAdjustment;
@@ -72,7 +73,7 @@ use orml_utilities::simulate_execution;
 use pallet_transaction_payment::RuntimeDispatchInfo;
 use pallet_xnft::{
 	misc::{GeneralIndexCollectionId, IndexAssetInstance},
-	traits::{DerivativeWithdrawal, NftInterface},
+	traits::{CollectionCreationWeight, DerivativeWithdrawal, NftInterface},
 };
 
 use frame_support::{
@@ -1361,10 +1362,18 @@ parameter_types! {
 	};
 }
 
+pub struct ClassCreationWeight;
+impl<CollectionId> CollectionCreationWeight<CollectionId> for ClassCreationWeight {
+	fn collection_creation_weight(_data: &CollectionId) -> Weight {
+		<Runtime as module_nft::Config>::WeightInfo::create_class()
+	}
+}
+
 pub type XnftOrml = orml_nft::xnft::XnftAdapter<
 	Runtime,
 	GeneralIndexCollectionId<<Runtime as orml_nft::Config>::ClassId>,
 	IndexAssetInstance<<Runtime as orml_nft::Config>::TokenId>,
+	ClassCreationWeight,
 	DerivativeTokenData,
 >;
 
@@ -1372,6 +1381,7 @@ impl NftInterface<Runtime> for module_nft::Pallet<Runtime> {
 	type CollectionId = <XnftOrml as NftInterface<Runtime>>::CollectionId;
 	type TokenId = <XnftOrml as NftInterface<Runtime>>::TokenId;
 	type PalletDispatchErrors = <XnftOrml as NftInterface<Runtime>>::PalletDispatchErrors;
+	type CollectionCreationWeight = <XnftOrml as NftInterface<Runtime>>::CollectionCreationWeight;
 	type DerivativeCollectionData = Attributes;
 
 	fn create_derivative_collection(
@@ -1415,6 +1425,7 @@ impl NftInterface<Runtime> for module_nft::Pallet<Runtime> {
 
 impl pallet_xnft::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
+	type WeightInfo = pallet_xnft::weights::SubstrateWeight<Runtime>;
 	type UniversalLocation = xcm_config::UniversalLocation;
 	type PalletId = XnftPalletId;
 	type NftCollectionsLocation = xcm_config::NftPalletLocation;
